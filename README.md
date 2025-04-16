@@ -111,5 +111,5 @@ MIT
 ---
 
 <p align="center">
-  <sub>Created with ❤️ by <a href="https://github.com/neilyboy">neilyboy</a> – Powered by <a href="https://ffmpeg.org/">ffmpeg</a> & <a href="https://imagemagick.org/">ImageMagick</a></sub>
+  <sub>Created by <a href="https://github.com/neilyboy">neilyboy</a> – Powered by <a href="https://ffmpeg.org/">ffmpeg</a> & <a href="https://imagemagick.org/">ImageMagick</a></sub>
 </p>
