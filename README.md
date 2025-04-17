@@ -16,9 +16,7 @@
 
 ---
 
-<p align="center">
-  <img src="sample_output.png" alt="SnapGrid Example Output" width="90%"/>
-</p>
+![SampleOutput](https://github.com/user-attachments/assets/3c9a3de7-b61f-4231-9d37-8a9bd32258cd)
 
 ---
 
