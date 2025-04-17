@@ -31,6 +31,10 @@
 - 🚀 Logo and tagline branding, auto-scaled and centered
 - 📏 All elements scale with output image size
 - 📦 Output as PNG or JPG
+- 📈 Dynamic title font scaling
+- 📊 User-configurable logo height
+- 📄 User-configurable header font
+- 📐 Robust header layout
 
 ## ⚡ Requirements
 
@@ -166,3 +170,58 @@ MIT
 <p align="center">
   <sub>Created with ❤️ by <a href="https://github.com/neilyboy">neilyboy</a> – Powered by <a href="https://ffmpeg.org/">ffmpeg</a> & <a href="https://imagemagick.org/">ImageMagick</a></sub>
 </p>
+
+## Advanced Header Customization
+
+### Dynamic Title Font Scaling
+- The title (filename) will automatically shrink to fit the available width in the header.
+- The maximum width for the title is set to nearly the full header width, leaving only enough space for the logo and padding on the right.
+- Font scaling is automatic; you can adjust the default and minimum font sizes in the script:
+  - `TITLE_FONT_SIZE` (default, based on thumbnail height)
+  - `MIN_TITLE_FONT_SIZE` (default: 18)
+
+### User-Configurable Logo Height
+- The logo in the header is always resized to a user-configurable height.
+- Change the logo height by editing the `LOGO_HEIGHT_PX` variable near the top of `snapgrid.sh` (default: 72 pixels).
+- Example:
+  ```bash
+  LOGO_HEIGHT_PX=64  # Set logo height to 64px
+  ```
+
+### User-Configurable Header Font
+- The font for the title is user-configurable via the `HEADER_FONT_FILE` variable near the top of `snapgrid.sh`.
+- Default: `DejaVu-Sans` (available on most systems). You may change to any installed font, e.g. `Liberation-Sans`, `Arial`, etc.
+- Example:
+  ```bash
+  HEADER_FONT_FILE="Liberation-Sans"
+  ```
+
+### Robust Header Layout
+- **Left side (stacked):** Title (filename) and metadata.
+- **Right side (stacked):** Logo, tagline, and URL, all right-justified and stacked vertically.
+- The title can extend nearly to the logo for maximum space.
+- No overlap is possible, even with very long filenames.
+
+### Example Usage
+
+```bash
+./snapgrid.sh -i input.mp4 -o output.png \
+  -C '#ffffff' -M '#cccccc' -G '#b0c4ff' -U '#b0c4ff' \
+  -T shadow -E outline -Q none -W shadow \
+  # (and any other options)
+```
+
+#### Customizing Logo and Font
+- To use a different logo, place your PNG file as `snap_grid_logo.png` in the same directory as `snapgrid.sh`.
+- To change logo size, edit `LOGO_HEIGHT_PX` at the top of the script.
+- To change the title font, edit `HEADER_FONT_FILE` at the top of the script.
+
+### Notes
+- The script will always ensure the title fits the allowed space, even for extremely long filenames.
+- If you encounter font warnings, set `HEADER_FONT_FILE` to a font that is installed on your system (see `fc-list` for available fonts).
+
+---
+
+For more details on all options, see the comments at the top of `snapgrid.sh` or run:
+```bash
+./snapgrid.sh -h

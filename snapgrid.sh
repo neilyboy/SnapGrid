@@ -60,6 +60,12 @@ URL_SHADOW_COLOR="#222222"
 URL_SHADOW_OFFSET="2x2"
 URL_SHADOW_BLUR=0
 
+# --- USER-CONFIGURABLE LOGO HEIGHT (in pixels) ---
+LOGO_HEIGHT_PX=72  # Change this to your preferred logo height
+
+# --- USER-CONFIGURABLE HEADER FONT (must be installed on your system) ---
+HEADER_FONT_FILE="DejaVu-Sans"  # Change to any installed font name (e.g. Arial, Liberation-Sans)
+
 usage() {
   echo "Usage: $0 -i <input_video> [options]"
   echo "Options:"
@@ -212,6 +218,10 @@ thumb_height=$(( thumb_width * HEIGHT / WIDTH ))
 # Increase header height for logo/text
 header_h=$((thumb_height / 1 + padding * 4))  # header now as tall as a thumb + extra padding
 
+# --- FONT SIZES FOR TAGLINE AND URL (must be set before logo and tagline logic) ---
+TAG_FONT=$((thumb_height/7))
+URL_FONT=$((thumb_height/10))
+
 echo "[SnapGrid] Extracting screenshots..."
 # --- EXTRACT SCREENSHOTS ---
 for i in $(seq 1 $screens); do
@@ -246,105 +256,149 @@ convert -size ${OUTW}x${OUTH} gradient:${BG1}-${BG2} "$TMPDIR/bg.png"
 convert "$TMPDIR/bg.png" "$TMPDIR/grid.png" -geometry +0+${header_h} -composite "$TMPDIR/composite.png"
 
 echo "[SnapGrid] Adding header and branding..."
-# --- DRAW HEADER TEXT ---
+# --- HEADER LAYOUT CONSTANTS ---
+BRANDING_WIDTH=$((OUTW / 3))      # Rightmost 1/3 for branding
+TEXT_AREA_WIDTH=$((OUTW - BRANDING_WIDTH - padding*4))
+LEFT_X=$((padding*2))
+RIGHT_X=$((OUTW - BRANDING_WIDTH + padding*2))
+
+# --- FONT SIZES FOR HEADER AND METADATA (must be set before use) ---
+HEADER_FONT=$((thumb_height/5))
+INFO_FONT=$((thumb_height/9))
+HEADER_LINE_Y=$((header_h/2 - HEADER_FONT/2 - 10))
+
+# --- HEADER TEXT VARIABLES (must be set before use) ---
 HEADER1="$BASENAME_NOEXT"
 HEADER2="Codec: $CODEC | Resolution: ${WIDTH}x${HEIGHT} | Duration: ${DURATION_FMT} | Bitrate: ${BITRATE_MBPS} Mbps | FPS: ${FPS} | Audio: ${AUDIO_CODEC} | Size: ${FILESIZE_HR}"
-HEADER_FONT=$((thumb_height/5))   # smaller
-INFO_FONT=$((thumb_height/9))     # much smaller
-HEADER_LINE_Y=$((header_h/2 - HEADER_FONT/2 - 10))  # center block
-META_Y=$((HEADER_LINE_Y + HEADER_FONT + 24))        # extra space below filename
 
+# --- DYNAMIC TITLE FONT SCALING ---
+# Allow title to go almost to the logo (leave just enough space for logo + padding)
+TITLE_MAX_WIDTH=$((OUTW - LOGO_HEIGHT_PX - padding * 8))
+TITLE_FONT_SIZE=$((thumb_height/5))
+MIN_TITLE_FONT_SIZE=18
+
+# Try to fit title text
+CUR_FONT_SIZE=$TITLE_FONT_SIZE
+while :; do
+  WIDTH=$(convert -background none -fill none -font "$HEADER_FONT_FILE" -pointsize $CUR_FONT_SIZE label:"$HEADER1" -format "%w" info:)
+  if [ "$WIDTH" -le "$TITLE_MAX_WIDTH" ] || [ "$CUR_FONT_SIZE" -le "$MIN_TITLE_FONT_SIZE" ]; then
+    break
+  fi
+  CUR_FONT_SIZE=$((CUR_FONT_SIZE-2))
+done
+TITLE_FONT_FINAL=$CUR_FONT_SIZE
+
+# --- DRAW TITLE (filename) LEFT, STACKED ---
 HEADERED_IMG="$TMPDIR/headered.png"
 if [ "$TITLE_EFFECT" = "shadow" ]; then
   convert "$TMPDIR/composite.png" \
-    -fill "$TITLE_SHADOW_COLOR" -gravity NorthWest -pointsize $HEADER_FONT \
-    -annotate +$((padding*2+${TITLE_SHADOW_OFFSET%%x*}))+$((HEADER_LINE_Y+${TITLE_SHADOW_OFFSET#*x})) "$HEADER1" \
+    -fill "$TITLE_SHADOW_COLOR" -gravity NorthWest -font "$HEADER_FONT_FILE" -pointsize $TITLE_FONT_FINAL \
+    -annotate +$LEFT_X+$HEADER_LINE_Y "$HEADER1" \
     $( [ "$TITLE_SHADOW_BLUR" -gt 0 ] && echo "-blur 0x$TITLE_SHADOW_BLUR" ) \
-    -fill "$TITLE_COLOR" -gravity NorthWest -pointsize $HEADER_FONT \
-    -annotate +$((padding*2))+$HEADER_LINE_Y "$HEADER1" \
+    -fill "$TITLE_COLOR" -gravity NorthWest -font "$HEADER_FONT_FILE" -pointsize $TITLE_FONT_FINAL \
+    -annotate +$LEFT_X+$HEADER_LINE_Y "$HEADER1" \
     "$HEADERED_IMG"
 elif [ "$TITLE_EFFECT" = "outline" ]; then
   convert "$TMPDIR/composite.png" \
     -stroke "$TITLE_OUTLINE_COLOR" -strokewidth $TITLE_OUTLINE_WIDTH -fill "$TITLE_COLOR" \
-    -gravity NorthWest -pointsize $HEADER_FONT \
-    -annotate +$((padding*2))+$HEADER_LINE_Y "$HEADER1" -stroke none \
+    -gravity NorthWest -font "$HEADER_FONT_FILE" -pointsize $TITLE_FONT_FINAL \
+    -annotate +$LEFT_X+$HEADER_LINE_Y "$HEADER1" -stroke none \
     "$HEADERED_IMG"
 else
   convert "$TMPDIR/composite.png" \
-    -fill "$TITLE_COLOR" -gravity NorthWest -pointsize $HEADER_FONT \
-    -annotate +$((padding*2))+$HEADER_LINE_Y "$HEADER1" \
+    -fill "$TITLE_COLOR" -gravity NorthWest -font "$HEADER_FONT_FILE" -pointsize $TITLE_FONT_FINAL \
+    -annotate +$LEFT_X+$HEADER_LINE_Y "$HEADER1" \
     "$HEADERED_IMG"
 fi
 
+# --- DRAW METADATA LEFT, STACKED BELOW TITLE ---
 HEADERED2_IMG="$TMPDIR/headered2.png"
+META_Y=$((HEADER_LINE_Y + HEADER_FONT + 24))
 if [ "$META_EFFECT" = "shadow" ]; then
   convert "$HEADERED_IMG" \
     -fill "$META_SHADOW_COLOR" -gravity NorthWest -pointsize $INFO_FONT \
-    -annotate +$((padding*2+${META_SHADOW_OFFSET%%x*}))+$((META_Y+${META_SHADOW_OFFSET#*x})) "$HEADER2" \
+    -annotate +$LEFT_X+$META_Y "$HEADER2" \
     $( [ "$META_SHADOW_BLUR" -gt 0 ] && echo "-blur 0x$META_SHADOW_BLUR" ) \
     -fill "$META_COLOR" -gravity NorthWest -pointsize $INFO_FONT \
-    -annotate +$((padding*2))+$META_Y "$HEADER2" \
+    -annotate +$LEFT_X+$META_Y "$HEADER2" \
     "$HEADERED2_IMG"
 elif [ "$META_EFFECT" = "outline" ]; then
   convert "$HEADERED_IMG" \
     -stroke "$META_OUTLINE_COLOR" -strokewidth $META_OUTLINE_WIDTH -fill "$META_COLOR" \
     -gravity NorthWest -pointsize $INFO_FONT \
-    -annotate +$((padding*2))+$META_Y "$HEADER2" -stroke none \
+    -annotate +$LEFT_X+$META_Y "$HEADER2" -stroke none \
     "$HEADERED2_IMG"
 else
   convert "$HEADERED_IMG" \
     -fill "$META_COLOR" -gravity NorthWest -pointsize $INFO_FONT \
-    -annotate +$((padding*2))+$META_Y "$HEADER2" \
+    -annotate +$LEFT_X+$META_Y "$HEADER2" \
     "$HEADERED2_IMG"
 fi
 
-# --- ADD LOGO AND TAGLINE IN HEADER ---
-# Ensure fonts are set before use
-TAG_FONT=$((thumb_height/7))
-URL_FONT=$((thumb_height/10))
+# --- ADD LOGO, TAGLINE, URL STACKED ON RIGHT ---
+LOGO="$(dirname "$0")/snap_grid_logo.png"
+LOGOED_IMG="$TMPDIR/logoed.png"
 LOGOPAD=$((padding*2))
-LOGO_Y=$(( (header_h - (TAG_FONT + URL_FONT + 30)) / 2 ))
+LOGO_TOP_Y=$((HEADER_LINE_Y))
+if [ -f "$LOGO" ]; then
+  convert "$LOGO" -resize x${LOGO_HEIGHT_PX} "$TMPDIR/logo.png"
+  composite -gravity NorthEast -geometry +${LOGOPAD}+$LOGO_TOP_Y "$TMPDIR/logo.png" "$HEADERED2_IMG" "$LOGOED_IMG"
+else
+  cp "$HEADERED2_IMG" "$LOGOED_IMG"
+fi
+
+# --- Get logo height after resize ---
+if [ -f "$TMPDIR/logo.png" ]; then
+  LOGO_HEIGHT=$(identify -format "%h" "$TMPDIR/logo.png")
+else
+  LOGO_HEIGHT=0
+fi
+TAGLINE_Y=$((LOGO_TOP_Y + LOGO_HEIGHT + 10))
+URL_Y=$((TAGLINE_Y + TAG_FONT + 5))
+
+# --- ADD TAGLINE STACKED BELOW LOGO ---
 TAGGED_IMG="$TMPDIR/tagged.png"
 if [ "$TAGLINE_EFFECT" = "shadow" ]; then
-  convert "$HEADERED2_IMG" \
+  convert "$LOGOED_IMG" \
     -fill "$TAGLINE_SHADOW_COLOR" -gravity NorthEast -pointsize $TAG_FONT \
-    -annotate +$((LOGOPAD+${TAGLINE_SHADOW_OFFSET%%x*}))+$(($LOGO_Y + 10 + ${TAGLINE_SHADOW_OFFSET#*x})) "$TAGLINE" \
+    -annotate +$((LOGOPAD+${TAGLINE_SHADOW_OFFSET%%x*}))+$((TAGLINE_Y+${TAGLINE_SHADOW_OFFSET#*x})) "$TAGLINE" \
     $( [ "$TAGLINE_SHADOW_BLUR" -gt 0 ] && echo "-blur 0x$TAGLINE_SHADOW_BLUR" ) \
     -gravity NorthEast -fill "$TAGLINE_COLOR" -pointsize $TAG_FONT \
-    -annotate +$((LOGOPAD))+$(($LOGO_Y + 10)) "$TAGLINE" \
+    -annotate +$LOGOPAD+$TAGLINE_Y "$TAGLINE" \
     "$TAGGED_IMG"
 elif [ "$TAGLINE_EFFECT" = "outline" ]; then
-  convert "$HEADERED2_IMG" \
+  convert "$LOGOED_IMG" \
     -gravity NorthEast -stroke "$TAGLINE_OUTLINE_COLOR" -strokewidth $TAGLINE_OUTLINE_WIDTH \
     -fill "$TAGLINE_COLOR" -pointsize $TAG_FONT \
-    -annotate +$((LOGOPAD))+$(($LOGO_Y + 10)) "$TAGLINE" -stroke none \
+    -annotate +$LOGOPAD+$TAGLINE_Y "$TAGLINE" -stroke none \
     "$TAGGED_IMG"
 else
-  convert "$HEADERED2_IMG" \
+  convert "$LOGOED_IMG" \
     -gravity NorthEast -fill "$TAGLINE_COLOR" -pointsize $TAG_FONT \
-    -annotate +$((LOGOPAD))+$(($LOGO_Y + 10)) "$TAGLINE" \
+    -annotate +$LOGOPAD+$TAGLINE_Y "$TAGLINE" \
     "$TAGGED_IMG"
 fi
 
+# --- ADD URL STACKED BELOW TAGLINE ---
 FINAL_IMG="$TMPDIR/final.png"
 if [ "$URL_EFFECT" = "shadow" ]; then
   convert "$TAGGED_IMG" \
     -fill "$URL_SHADOW_COLOR" -gravity NorthEast -pointsize $URL_FONT \
-    -annotate +$((LOGOPAD+${URL_SHADOW_OFFSET%%x*}))+$(($LOGO_Y + TAG_FONT + 20 + ${URL_SHADOW_OFFSET#*x})) "$URL" \
+    -annotate +$((LOGOPAD+${URL_SHADOW_OFFSET%%x*}))+$((${URL_Y}+${URL_SHADOW_OFFSET#*x})) "$URL" \
     $( [ "$URL_SHADOW_BLUR" -gt 0 ] && echo "-blur 0x$URL_SHADOW_BLUR" ) \
     -gravity NorthEast -fill "$URL_COLOR" -pointsize $URL_FONT \
-    -annotate +$((LOGOPAD))+$(($LOGO_Y + TAG_FONT + 20)) "$URL" \
+    -annotate +$LOGOPAD+$URL_Y "$URL" \
     "$FINAL_IMG"
 elif [ "$URL_EFFECT" = "outline" ]; then
   convert "$TAGGED_IMG" \
     -gravity NorthEast -stroke "$URL_OUTLINE_COLOR" -strokewidth $URL_OUTLINE_WIDTH \
     -fill "$URL_COLOR" -pointsize $URL_FONT \
-    -annotate +$((LOGOPAD))+$(($LOGO_Y + TAG_FONT + 20)) "$URL" -stroke none \
+    -annotate +$LOGOPAD+$URL_Y "$URL" -stroke none \
     "$FINAL_IMG"
 else
   convert "$TAGGED_IMG" \
     -gravity NorthEast -fill "$URL_COLOR" -pointsize $URL_FONT \
-    -annotate +$((LOGOPAD))+$(($LOGO_Y + TAG_FONT + 20)) "$URL" \
+    -annotate +$LOGOPAD+$URL_Y "$URL" \
     "$FINAL_IMG"
 fi
 
