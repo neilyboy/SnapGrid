@@ -254,74 +254,103 @@ INFO_FONT=$((thumb_height/9))     # much smaller
 HEADER_LINE_Y=$((header_h/2 - HEADER_FONT/2 - 10))  # center block
 META_Y=$((HEADER_LINE_Y + HEADER_FONT + 24))        # extra space below filename
 
-# Compose header text with effect logic for title and metadata
-convert "$TMPDIR/composite.png" \
-  $(
-    if [ "$TITLE_EFFECT" = "shadow" ]; then
-      echo "-fill $TITLE_SHADOW_COLOR -gravity NorthWest -pointsize $HEADER_FONT -annotate +$((padding*2+${TITLE_SHADOW_OFFSET%%x*}))+$((HEADER_LINE_Y+${TITLE_SHADOW_OFFSET#*x})) \"$HEADER1\""
-      if [ "$TITLE_SHADOW_BLUR" -gt 0 ]; then
-        echo "-blur 0x$TITLE_SHADOW_BLUR"
-      fi
-      echo "-fill $TITLE_COLOR -gravity NorthWest -pointsize $HEADER_FONT -annotate +$((padding*2))+$HEADER_LINE_Y \"$HEADER1\""
-    elif [ "$TITLE_EFFECT" = "outline" ]; then
-      echo "-stroke $TITLE_OUTLINE_COLOR -strokewidth $TITLE_OUTLINE_WIDTH -fill $TITLE_COLOR -gravity NorthWest -pointsize $HEADER_FONT -annotate +$((padding*2))+$HEADER_LINE_Y \"$HEADER1\" -stroke none"
-    else
-      echo "-fill $TITLE_COLOR -gravity NorthWest -pointsize $HEADER_FONT -annotate +$((padding*2))+$HEADER_LINE_Y \"$HEADER1\""
-    fi
-  ) \
-  $(
-    if [ "$META_EFFECT" = "shadow" ]; then
-      echo "-fill $META_SHADOW_COLOR -gravity NorthWest -pointsize $INFO_FONT -annotate +$((padding*2+${META_SHADOW_OFFSET%%x*}))+$((META_Y+${META_SHADOW_OFFSET#*x})) \"$HEADER2\""
-      if [ "$META_SHADOW_BLUR" -gt 0 ]; then
-        echo "-blur 0x$META_SHADOW_BLUR"
-      fi
-      echo "-fill $META_COLOR -gravity NorthWest -pointsize $INFO_FONT -annotate +$((padding*2))+$META_Y \"$HEADER2\""
-    elif [ "$META_EFFECT" = "outline" ]; then
-      echo "-stroke $META_OUTLINE_COLOR -strokewidth $META_OUTLINE_WIDTH -fill $META_COLOR -gravity NorthWest -pointsize $INFO_FONT -annotate +$((padding*2))+$META_Y \"$HEADER2\" -stroke none"
-    else
-      echo "-fill $META_COLOR -gravity NorthWest -pointsize $INFO_FONT -annotate +$((padding*2))+$META_Y \"$HEADER2\""
-    fi
-  ) \
-  "$TMPDIR/headered.png"
+HEADERED_IMG="$TMPDIR/headered.png"
+if [ "$TITLE_EFFECT" = "shadow" ]; then
+  convert "$TMPDIR/composite.png" \
+    -fill "$TITLE_SHADOW_COLOR" -gravity NorthWest -pointsize $HEADER_FONT \
+    -annotate +$((padding*2+${TITLE_SHADOW_OFFSET%%x*}))+$((HEADER_LINE_Y+${TITLE_SHADOW_OFFSET#*x})) "$HEADER1" \
+    $( [ "$TITLE_SHADOW_BLUR" -gt 0 ] && echo "-blur 0x$TITLE_SHADOW_BLUR" ) \
+    -fill "$TITLE_COLOR" -gravity NorthWest -pointsize $HEADER_FONT \
+    -annotate +$((padding*2))+$HEADER_LINE_Y "$HEADER1" \
+    "$HEADERED_IMG"
+elif [ "$TITLE_EFFECT" = "outline" ]; then
+  convert "$TMPDIR/composite.png" \
+    -stroke "$TITLE_OUTLINE_COLOR" -strokewidth $TITLE_OUTLINE_WIDTH -fill "$TITLE_COLOR" \
+    -gravity NorthWest -pointsize $HEADER_FONT \
+    -annotate +$((padding*2))+$HEADER_LINE_Y "$HEADER1" -stroke none \
+    "$HEADERED_IMG"
+else
+  convert "$TMPDIR/composite.png" \
+    -fill "$TITLE_COLOR" -gravity NorthWest -pointsize $HEADER_FONT \
+    -annotate +$((padding*2))+$HEADER_LINE_Y "$HEADER1" \
+    "$HEADERED_IMG"
+fi
+
+HEADERED2_IMG="$TMPDIR/headered2.png"
+if [ "$META_EFFECT" = "shadow" ]; then
+  convert "$HEADERED_IMG" \
+    -fill "$META_SHADOW_COLOR" -gravity NorthWest -pointsize $INFO_FONT \
+    -annotate +$((padding*2+${META_SHADOW_OFFSET%%x*}))+$((META_Y+${META_SHADOW_OFFSET#*x})) "$HEADER2" \
+    $( [ "$META_SHADOW_BLUR" -gt 0 ] && echo "-blur 0x$META_SHADOW_BLUR" ) \
+    -fill "$META_COLOR" -gravity NorthWest -pointsize $INFO_FONT \
+    -annotate +$((padding*2))+$META_Y "$HEADER2" \
+    "$HEADERED2_IMG"
+elif [ "$META_EFFECT" = "outline" ]; then
+  convert "$HEADERED_IMG" \
+    -stroke "$META_OUTLINE_COLOR" -strokewidth $META_OUTLINE_WIDTH -fill "$META_COLOR" \
+    -gravity NorthWest -pointsize $INFO_FONT \
+    -annotate +$((padding*2))+$META_Y "$HEADER2" -stroke none \
+    "$HEADERED2_IMG"
+else
+  convert "$HEADERED_IMG" \
+    -fill "$META_COLOR" -gravity NorthWest -pointsize $INFO_FONT \
+    -annotate +$((padding*2))+$META_Y "$HEADER2" \
+    "$HEADERED2_IMG"
+fi
 
 # --- ADD LOGO AND TAGLINE IN HEADER ---
 LOGOPAD=$((padding*2))
 LOGO_Y=$(( (header_h - (TAG_FONT + URL_FONT + 30)) / 2 ))
-convert "$TMPDIR/logoed.png" \
-  $(
-    if [ "$TAGLINE_EFFECT" = "shadow" ]; then
-      echo "-fill $TAGLINE_SHADOW_COLOR -gravity NorthEast -pointsize $TAG_FONT -annotate +$((LOGOPAD+${TAGLINE_SHADOW_OFFSET%%x*}))+$(($LOGO_Y + 10 + ${TAGLINE_SHADOW_OFFSET#*x})) \"$TAGLINE\""
-      if [ "$TAGLINE_SHADOW_BLUR" -gt 0 ]; then
-        echo "-blur 0x$TAGLINE_SHADOW_BLUR"
-      fi
-      echo "-gravity NorthEast -fill $TAGLINE_COLOR -pointsize $TAG_FONT -annotate +$((LOGOPAD))+$(($LOGO_Y + 10)) \"$TAGLINE\""
-    elif [ "$TAGLINE_EFFECT" = "outline" ]; then
-      echo "-gravity NorthEast -stroke $TAGLINE_OUTLINE_COLOR -strokewidth $TAGLINE_OUTLINE_WIDTH -fill $TAGLINE_COLOR -pointsize $TAG_FONT -annotate +$((LOGOPAD))+$(($LOGO_Y + 10)) \"$TAGLINE\" -stroke none"
-    else
-      echo "-gravity NorthEast -fill $TAGLINE_COLOR -pointsize $TAG_FONT -annotate +$((LOGOPAD))+$(($LOGO_Y + 10)) \"$TAGLINE\""
-    fi
-  ) \
-  $(
-    if [ "$URL_EFFECT" = "shadow" ]; then
-      echo "-fill $URL_SHADOW_COLOR -gravity NorthEast -pointsize $URL_FONT -annotate +$((LOGOPAD+${URL_SHADOW_OFFSET%%x*}))+$(($LOGO_Y + TAG_FONT + 20 + ${URL_SHADOW_OFFSET#*x})) \"$URL\""
-      if [ "$URL_SHADOW_BLUR" -gt 0 ]; then
-        echo "-blur 0x$URL_SHADOW_BLUR"
-      fi
-      echo "-gravity NorthEast -fill $URL_COLOR -pointsize $URL_FONT -annotate +$((LOGOPAD))+$(($LOGO_Y + TAG_FONT + 20)) \"$URL\""
-    elif [ "$URL_EFFECT" = "outline" ]; then
-      echo "-gravity NorthEast -stroke $URL_OUTLINE_COLOR -strokewidth $URL_OUTLINE_WIDTH -fill $URL_COLOR -pointsize $URL_FONT -annotate +$((LOGOPAD))+$(($LOGO_Y + TAG_FONT + 20)) \"$URL\" -stroke none"
-    else
-      echo "-gravity NorthEast -fill $URL_COLOR -pointsize $URL_FONT -annotate +$((LOGOPAD))+$(($LOGO_Y + TAG_FONT + 20)) \"$URL\""
-    fi
-  ) \
-  "$TMPDIR/final.png"
+TAGGED_IMG="$TMPDIR/tagged.png"
+if [ "$TAGLINE_EFFECT" = "shadow" ]; then
+  convert "$HEADERED2_IMG" \
+    -fill "$TAGLINE_SHADOW_COLOR" -gravity NorthEast -pointsize $TAG_FONT \
+    -annotate +$((LOGOPAD+${TAGLINE_SHADOW_OFFSET%%x*}))+$(($LOGO_Y + 10 + ${TAGLINE_SHADOW_OFFSET#*x})) "$TAGLINE" \
+    $( [ "$TAGLINE_SHADOW_BLUR" -gt 0 ] && echo "-blur 0x$TAGLINE_SHADOW_BLUR" ) \
+    -gravity NorthEast -fill "$TAGLINE_COLOR" -pointsize $TAG_FONT \
+    -annotate +$((LOGOPAD))+$(($LOGO_Y + 10)) "$TAGLINE" \
+    "$TAGGED_IMG"
+elif [ "$TAGLINE_EFFECT" = "outline" ]; then
+  convert "$HEADERED2_IMG" \
+    -gravity NorthEast -stroke "$TAGLINE_OUTLINE_COLOR" -strokewidth $TAGLINE_OUTLINE_WIDTH \
+    -fill "$TAGLINE_COLOR" -pointsize $TAG_FONT \
+    -annotate +$((LOGOPAD))+$(($LOGO_Y + 10)) "$TAGLINE" -stroke none \
+    "$TAGGED_IMG"
+else
+  convert "$HEADERED2_IMG" \
+    -gravity NorthEast -fill "$TAGLINE_COLOR" -pointsize $TAG_FONT \
+    -annotate +$((LOGOPAD))+$(($LOGO_Y + 10)) "$TAGLINE" \
+    "$TAGGED_IMG"
+fi
+
+FINAL_IMG="$TMPDIR/final.png"
+if [ "$URL_EFFECT" = "shadow" ]; then
+  convert "$TAGGED_IMG" \
+    -fill "$URL_SHADOW_COLOR" -gravity NorthEast -pointsize $URL_FONT \
+    -annotate +$((LOGOPAD+${URL_SHADOW_OFFSET%%x*}))+$(($LOGO_Y + TAG_FONT + 20 + ${URL_SHADOW_OFFSET#*x})) "$URL" \
+    $( [ "$URL_SHADOW_BLUR" -gt 0 ] && echo "-blur 0x$URL_SHADOW_BLUR" ) \
+    -gravity NorthEast -fill "$URL_COLOR" -pointsize $URL_FONT \
+    -annotate +$((LOGOPAD))+$(($LOGO_Y + TAG_FONT + 20)) "$URL" \
+    "$FINAL_IMG"
+elif [ "$URL_EFFECT" = "outline" ]; then
+  convert "$TAGGED_IMG" \
+    -gravity NorthEast -stroke "$URL_OUTLINE_COLOR" -strokewidth $URL_OUTLINE_WIDTH \
+    -fill "$URL_COLOR" -pointsize $URL_FONT \
+    -annotate +$((LOGOPAD))+$(($LOGO_Y + TAG_FONT + 20)) "$URL" -stroke none \
+    "$FINAL_IMG"
+else
+  convert "$TAGGED_IMG" \
+    -gravity NorthEast -fill "$URL_COLOR" -pointsize $URL_FONT \
+    -annotate +$((LOGOPAD))+$(($LOGO_Y + TAG_FONT + 20)) "$URL" \
+    "$FINAL_IMG"
+fi
 
 echo "[SnapGrid] Finalizing output..."
 # --- SCALE OUTPUT IF NEEDED ---
 if [ "$size" != "100" ]; then
-  convert "$TMPDIR/final.png" -resize ${size}% "$OUTPUT"
+  convert "$FINAL_IMG" -resize ${size}% "$OUTPUT"
 else
-  cp "$TMPDIR/final.png" "$OUTPUT"
+  cp "$FINAL_IMG" "$OUTPUT"
 fi
 
 # --- Fix possible bottom line artifact by cropping 1px if needed ---
