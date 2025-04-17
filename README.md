@@ -72,11 +72,15 @@ bash snapgrid.sh -i <input_video> [options]
 | `-k <border_color>` | Screenshot border color | #000000 |
 | `-S <shadow_color>` | Header text shadow color | #222222 |
 | `-O <shadow_offset>` | Header text shadow offset | 2x2 |
+| `-C <title_color>` | Title (filename) text color | #ffffff |
+| `-M <meta_color>` | Metadata line text color | #ffffff |
+| `-G <tagline_color>` | Tagline text color | #ffffff |
+| `-U <url_color>` | URL text color | #b0c4ff |
 | `-h` | Show help message | |
 
 ### Example
 ```sh
-bash snapgrid.sh -i mymovie.mp4 -s 15 -z 50 -c 4 -b "#222244,#5588ff" -p 10 -t 320 -w 3 -k "#ff0000" -S "#0000ff" -O "4x4" -o thumbs.png
+bash snapgrid.sh -i mymovie.mp4 -s 15 -z 50 -c 4 -b "#222244,#5588ff" -p 10 -t 320 -w 3 -k "#ff0000" -S "#0000ff" -O "4x4" -C "#ffcc00" -M "#00ffcc" -G "#ff00cc" -U "#00aaff" -o thumbs.png
 ```
 
 ---
@@ -85,6 +89,11 @@ bash snapgrid.sh -i mymovie.mp4 -s 15 -z 50 -c 4 -b "#222244,#5588ff" -p 10 -t 3
 - **Logo:** Place `snap_grid_logo.png` in the script directory, or specify with `-l`.
 - **Borders:** Use `-w` and `-k` for border thickness and color.
 - **Text Shadow:** Use `-S` and `-O` for shadow color and offset.
+- **Header Text Colors:**
+  - `-C` for the title (filename)
+  - `-M` for the metadata line
+  - `-G` for the tagline
+  - `-U` for the URL on the right
 - **Gradient:** Use `-b` for custom background gradients.
 
 ## 🖼️ Output Example
@@ -111,5 +120,5 @@ MIT
 ---
 
 <p align="center">
-  <sub>Created by <a href="https://github.com/neilyboy">neilyboy</a> – Powered by <a href="https://ffmpeg.org/">ffmpeg</a> & <a href="https://imagemagick.org/">ImageMagick</a></sub>
+  <sub>Created with ❤️ by <a href="https://github.com/neilyboy">neilyboy</a> – Powered by <a href="https://ffmpeg.org/">ffmpeg</a> & <a href="https://imagemagick.org/">ImageMagick</a></sub>
 </p>

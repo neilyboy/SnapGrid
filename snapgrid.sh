@@ -21,6 +21,10 @@ BORDER_WIDTH=2   # Default border width (px, integer)
 BORDER_COLOR="#000000" # Default border color (black)
 SHADOW_COLOR="#222222"  # Default text shadow color
 SHADOW_OFFSET="2x2"     # Default shadow offset (ImageMagick format: +x+y)
+TITLE_COLOR="#ffffff"      # Main filename/title (default: white)
+META_COLOR="#ffffff"       # Metadata line (default: white)
+TAGLINE_COLOR="#ffffff"    # Tagline text (default: white)
+URL_COLOR="#b0c4ff"        # URL text (default: blue)
 
 usage() {
   echo "Usage: $0 -i <input_video> [options]"
@@ -38,12 +42,16 @@ usage() {
   echo "  -k <border_color>     Screenshot border color (default: #000000)"
   echo "  -S <shadow_color>     Header text shadow color (default: #222222)"
   echo "  -O <shadow_offset>    Header text shadow offset (default: 2x2)"
+  echo "  -C <title_color>      Title (filename) text color (default: #ffffff)"
+  echo "  -M <meta_color>       Metadata line text color (default: #ffffff)"
+  echo "  -G <tagline_color>    Tagline text color (default: #ffffff)"
+  echo "  -U <url_color>        URL text color (default: #b0c4ff)"
   echo "  -h                    Show this help message"
   exit 1
 }
 
 # --- PARSE ARGS ---
-while getopts "i:o:s:c:z:p:b:l:t:w:k:S:O:h" opt; do
+while getopts "i:o:s:c:z:p:b:l:t:w:k:S:O:C:M:G:U:h" opt; do
   case $opt in
     i) INPUT="$OPTARG" ;;
     o) OUTPUT="$OPTARG" ;;
@@ -61,6 +69,10 @@ while getopts "i:o:s:c:z:p:b:l:t:w:k:S:O:h" opt; do
     k) BORDER_COLOR="$OPTARG" ;;
     S) SHADOW_COLOR="$OPTARG" ;;
     O) SHADOW_OFFSET="$OPTARG" ;;
+    C) TITLE_COLOR="$OPTARG" ;;
+    M) META_COLOR="$OPTARG" ;;
+    G) TAGLINE_COLOR="$OPTARG" ;;
+    U) URL_COLOR="$OPTARG" ;;
     h) usage ;;
     *) usage ;;
   esac
@@ -146,12 +158,12 @@ INFO_FONT=$((thumb_height/9))     # much smaller
 HEADER_LINE_Y=$((header_h/2 - HEADER_FONT/2 - 10))  # center block
 META_Y=$((HEADER_LINE_Y + HEADER_FONT + 24))        # extra space below filename
 
-# Draw shadow first, then main text for both header lines
+# Draw shadow first, then main text for both header lines, using user colors
 convert "$TMPDIR/composite.png" \
   -fill "$SHADOW_COLOR" -gravity NorthWest -pointsize $HEADER_FONT -annotate +$((padding*2+${SHADOW_OFFSET%%x*}))+$((HEADER_LINE_Y+${SHADOW_OFFSET#*x})) "$HEADER1" \
-  -fill white -gravity NorthWest -pointsize $HEADER_FONT -annotate +$((padding*2))+$HEADER_LINE_Y "$HEADER1" \
+  -fill "$TITLE_COLOR" -gravity NorthWest -pointsize $HEADER_FONT -annotate +$((padding*2))+$HEADER_LINE_Y "$HEADER1" \
   -fill "$SHADOW_COLOR" -gravity NorthWest -pointsize $INFO_FONT -annotate +$((padding*2+${SHADOW_OFFSET%%x*}))+$((META_Y+${SHADOW_OFFSET#*x})) "$HEADER2" \
-  -fill white -gravity NorthWest -pointsize $INFO_FONT -annotate +$((padding*2))+$META_Y "$HEADER2" \
+  -fill "$META_COLOR" -gravity NorthWest -pointsize $INFO_FONT -annotate +$((padding*2))+$META_Y "$HEADER2" \
   "$TMPDIR/headered.png"
 
 # --- ADD LOGO AND TAGLINE IN HEADER ---
@@ -176,8 +188,8 @@ fi
 LOGOPAD=$((padding*2))
 LOGO_Y=$(( (header_h - (TAG_FONT + URL_FONT + 30)) / 2 ))
 convert "$TMPDIR/logoed.png" \
-  -gravity NorthEast -fill white -pointsize $TAG_FONT -annotate +$((LOGOPAD))+$(($LOGO_Y + 10)) "$TAGLINE" \
-  -gravity NorthEast -fill '#b0c4ff' -pointsize $URL_FONT -annotate +$((LOGOPAD))+$(($LOGO_Y + TAG_FONT + 20)) "$URL" \
+  -gravity NorthEast -fill "$TAGLINE_COLOR" -pointsize $TAG_FONT -annotate +$((LOGOPAD))+$(($LOGO_Y + 10)) "$TAGLINE" \
+  -gravity NorthEast -fill "$URL_COLOR" -pointsize $URL_FONT -annotate +$((LOGOPAD))+$(($LOGO_Y + TAG_FONT + 20)) "$URL" \
   "$TMPDIR/final.png"
 
 echo "[SnapGrid] Finalizing output..."
