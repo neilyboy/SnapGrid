@@ -76,25 +76,69 @@ bash snapgrid.sh -i <input_video> [options]
 | `-M <meta_color>` | Metadata line text color | #ffffff |
 | `-G <tagline_color>` | Tagline text color | #ffffff |
 | `-U <url_color>` | URL text color | #b0c4ff |
+| `-1 <Y\|N>` | Enable drop shadow for title | Y |
+| `-2 <Y\|N>` | Enable drop shadow for metadata | Y |
+| `-3 <Y\|N>` | Enable drop shadow for tagline | Y |
+| `-4 <Y\|N>` | Enable drop shadow for URL | Y |
 | `-h` | Show help message | |
+| `-T <effect>` | Title effect: `shadow`, `outline`, `none` | shadow |
+| `-E <effect>` | Metadata effect: `shadow`, `outline`, `none` | shadow |
+| `-Q <effect>` | Tagline effect: `shadow`, `outline`, `none` | shadow |
+| `-W <effect>` | URL effect: `shadow`, `outline`, `none` | shadow |
+| `--title-outline-color <color>` | Title outline color | #000000 |
+| `--title-outline-width <px>` | Title outline width | 2 |
+| `--title-shadow-color <color>` | Title shadow color | #222222 |
+| `--title-shadow-offset <XxY>` | Title shadow offset | 2x2 |
+| `--title-shadow-blur <radius>` | Title shadow blur radius | 0 |
+| `--meta-outline-color <color>` | Metadata outline color | #000000 |
+| `--meta-outline-width <px>` | Metadata outline width | 2 |
+| `--meta-shadow-color <color>` | Metadata shadow color | #222222 |
+| `--meta-shadow-offset <XxY>` | Metadata shadow offset | 2x2 |
+| `--meta-shadow-blur <radius>` | Metadata shadow blur radius | 0 |
+| `--tagline-outline-color <color>` | Tagline outline color | #000000 |
+| `--tagline-outline-width <px>` | Tagline outline width | 2 |
+| `--tagline-shadow-color <color>` | Tagline shadow color | #222222 |
+| `--tagline-shadow-offset <XxY>` | Tagline shadow offset | 2x2 |
+| `--tagline-shadow-blur <radius>` | Tagline shadow blur radius | 0 |
+| `--url-outline-color <color>` | URL outline color | #000000 |
+| `--url-outline-width <px>` | URL outline width | 2 |
+| `--url-shadow-color <color>` | URL shadow color | #222222 |
+| `--url-shadow-offset <XxY>` | URL shadow offset | 2x2 |
+| `--url-shadow-blur <radius>` | URL shadow blur radius | 0 |
 
 ### Example
 ```sh
-bash snapgrid.sh -i mymovie.mp4 -s 15 -z 50 -c 4 -b "#222244,#5588ff" -p 10 -t 320 -w 3 -k "#ff0000" -S "#0000ff" -O "4x4" -C "#ffcc00" -M "#00ffcc" -G "#ff00cc" -U "#00aaff" -o thumbs.png
+bash snapgrid.sh -i mymovie.mp4 -s 15 -z 50 -c 4 -b "#222244,#5588ff" -p 10 -t 320 -w 3 -k "#ff0000" -S "#0000ff" -O "4x4" -C "#ffcc00" -M "#00ffcc" -G "#ff00cc" -U "#00aaff" -1 N -2 Y -3 N -4 Y -o thumbs.png
+```
+
+### Example: Outline, Shadow, and Blur
+```sh
+# Title with outline, metadata with blurred shadow, tagline plain, URL with colored outline
+bash snapgrid.sh -i mymovie.mp4 \
+  -T outline --title-outline-color "#ffffff" --title-outline-width 4 \
+  -E shadow --meta-shadow-color "#000000" --meta-shadow-offset "4x4" --meta-shadow-blur 6 \
+  -Q none \
+  -W outline --url-outline-color "#ff00ff" --url-outline-width 3 \
+  -o thumbs.png
 ```
 
 ---
 
-## 🎨 Customization
-- **Logo:** Place `snap_grid_logo.png` in the script directory, or specify with `-l`.
-- **Borders:** Use `-w` and `-k` for border thickness and color.
-- **Text Shadow:** Use `-S` and `-O` for shadow color and offset.
-- **Header Text Colors:**
-  - `-C` for the title (filename)
-  - `-M` for the metadata line
-  - `-G` for the tagline
-  - `-U` for the URL on the right
-- **Gradient:** Use `-b` for custom background gradients.
+## 🎨 Advanced Customization
+
+Each header text element (title, metadata, tagline, URL) supports these effects:
+
+- **shadow:** Adds a drop shadow with customizable color, offset, and optional blur for a soft look.
+  - Example: `-T shadow --title-shadow-color "#222222" --title-shadow-offset "3x3" --title-shadow-blur 5`
+- **outline:** Adds a crisp border around the text with customizable color and width.
+  - Example: `-T outline --title-outline-color "#ff00ff" --title-outline-width 4`
+- **none:** Plain text, no shadow or outline.
+
+Mix and match per element:
+- `-T`, `-E`, `-Q`, `-W` set the effect for title, metadata, tagline, and URL respectively.
+- Use the corresponding `--*-outline-*` and `--*-shadow-*` options to control appearance.
+
+**Tip:** For maximum readability, use a blurred shadow or a high-contrast outline depending on your background.
 
 ## 🖼️ Output Example
 <p align="center">

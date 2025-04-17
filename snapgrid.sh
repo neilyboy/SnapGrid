@@ -25,6 +25,40 @@ TITLE_COLOR="#ffffff"      # Main filename/title (default: white)
 META_COLOR="#ffffff"       # Metadata line (default: white)
 TAGLINE_COLOR="#ffffff"    # Tagline text (default: white)
 URL_COLOR="#b0c4ff"        # URL text (default: blue)
+TITLE_SHADOW=Y
+META_SHADOW=Y
+TAGLINE_SHADOW=Y
+URL_SHADOW=Y
+
+# --- TEXT EFFECTS (shadow, outline, none) ---
+TITLE_EFFECT=shadow   # Options: shadow, outline, none
+META_EFFECT=shadow
+TAGLINE_EFFECT=shadow
+URL_EFFECT=shadow
+
+# Outline options (per text entity)
+TITLE_OUTLINE_COLOR="#000000"
+TITLE_OUTLINE_WIDTH=2
+META_OUTLINE_COLOR="#000000"
+META_OUTLINE_WIDTH=2
+TAGLINE_OUTLINE_COLOR="#000000"
+TAGLINE_OUTLINE_WIDTH=2
+URL_OUTLINE_COLOR="#000000"
+URL_OUTLINE_WIDTH=2
+
+# Shadow options (per text entity)
+TITLE_SHADOW_COLOR="#222222"
+TITLE_SHADOW_OFFSET="2x2"
+TITLE_SHADOW_BLUR=0
+META_SHADOW_COLOR="#222222"
+META_SHADOW_OFFSET="2x2"
+META_SHADOW_BLUR=0
+TAGLINE_SHADOW_COLOR="#222222"
+TAGLINE_SHADOW_OFFSET="2x2"
+TAGLINE_SHADOW_BLUR=0
+URL_SHADOW_COLOR="#222222"
+URL_SHADOW_OFFSET="2x2"
+URL_SHADOW_BLUR=0
 
 usage() {
   echo "Usage: $0 -i <input_video> [options]"
@@ -46,12 +80,70 @@ usage() {
   echo "  -M <meta_color>       Metadata line text color (default: #ffffff)"
   echo "  -G <tagline_color>    Tagline text color (default: #ffffff)"
   echo "  -U <url_color>        URL text color (default: #b0c4ff)"
+  echo "  -1 <Y|N>             Enable drop shadow for title (default: Y)"
+  echo "  -2 <Y|N>             Enable drop shadow for metadata (default: Y)"
+  echo "  -3 <Y|N>             Enable drop shadow for tagline (default: Y)"
+  echo "  -4 <Y|N>             Enable drop shadow for URL (default: Y)"
+  echo "  -T <effect>          Title effect: shadow|outline|none (default: shadow)"
+  echo "  -E <effect>          Metadata effect: shadow|outline|none (default: shadow)"
+  echo "  -Q <effect>          Tagline effect: shadow|outline|none (default: shadow)"
+  echo "  -W <effect>          URL effect: shadow|outline|none (default: shadow)"
+  echo "  --title-outline-color <color>    (default: #000000)"
+  echo "  --title-outline-width <px>       (default: 2)"
+  echo "  --title-shadow-color <color>     (default: #222222)"
+  echo "  --title-shadow-offset <XxY>      (default: 2x2)"
+  echo "  --title-shadow-blur <radius>     (default: 0)"
+  echo "  --meta-outline-color <color>     (default: #000000)"
+  echo "  --meta-outline-width <px>        (default: 2)"
+  echo "  --meta-shadow-color <color>      (default: #222222)"
+  echo "  --meta-shadow-offset <XxY>       (default: 2x2)"
+  echo "  --meta-shadow-blur <radius>      (default: 0)"
+  echo "  --tagline-outline-color <color>  (default: #000000)"
+  echo "  --tagline-outline-width <px>     (default: 2)"
+  echo "  --tagline-shadow-color <color>   (default: #222222)"
+  echo "  --tagline-shadow-offset <XxY>    (default: 2x2)"
+  echo "  --tagline-shadow-blur <radius>   (default: 0)"
+  echo "  --url-outline-color <color>      (default: #000000)"
+  echo "  --url-outline-width <px>         (default: 2)"
+  echo "  --url-shadow-color <color>       (default: #222222)"
+  echo "  --url-shadow-offset <XxY>        (default: 2x2)"
+  echo "  --url-shadow-blur <radius>       (default: 0)"
   echo "  -h                    Show this help message"
   exit 1
 }
 
 # --- PARSE ARGS ---
-while getopts "i:o:s:c:z:p:b:l:t:w:k:S:O:C:M:G:U:h" opt; do
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    -T) TITLE_EFFECT="$2"; shift 2;;
+    -E) META_EFFECT="$2"; shift 2;;
+    -Q) TAGLINE_EFFECT="$2"; shift 2;;
+    -W) URL_EFFECT="$2"; shift 2;;
+    --title-outline-color) TITLE_OUTLINE_COLOR="$2"; shift 2;;
+    --title-outline-width) TITLE_OUTLINE_WIDTH="$2"; shift 2;;
+    --title-shadow-color) TITLE_SHADOW_COLOR="$2"; shift 2;;
+    --title-shadow-offset) TITLE_SHADOW_OFFSET="$2"; shift 2;;
+    --title-shadow-blur) TITLE_SHADOW_BLUR="$2"; shift 2;;
+    --meta-outline-color) META_OUTLINE_COLOR="$2"; shift 2;;
+    --meta-outline-width) META_OUTLINE_WIDTH="$2"; shift 2;;
+    --meta-shadow-color) META_SHADOW_COLOR="$2"; shift 2;;
+    --meta-shadow-offset) META_SHADOW_OFFSET="$2"; shift 2;;
+    --meta-shadow-blur) META_SHADOW_BLUR="$2"; shift 2;;
+    --tagline-outline-color) TAGLINE_OUTLINE_COLOR="$2"; shift 2;;
+    --tagline-outline-width) TAGLINE_OUTLINE_WIDTH="$2"; shift 2;;
+    --tagline-shadow-color) TAGLINE_SHADOW_COLOR="$2"; shift 2;;
+    --tagline-shadow-offset) TAGLINE_SHADOW_OFFSET="$2"; shift 2;;
+    --tagline-shadow-blur) TAGLINE_SHADOW_BLUR="$2"; shift 2;;
+    --url-outline-color) URL_OUTLINE_COLOR="$2"; shift 2;;
+    --url-outline-width) URL_OUTLINE_WIDTH="$2"; shift 2;;
+    --url-shadow-color) URL_SHADOW_COLOR="$2"; shift 2;;
+    --url-shadow-offset) URL_SHADOW_OFFSET="$2"; shift 2;;
+    --url-shadow-blur) URL_SHADOW_BLUR="$2"; shift 2;;
+    *) break;;
+  esac
+done
+
+while getopts "i:o:s:c:z:p:b:l:t:w:k:S:O:C:M:G:U:1:2:3:4:h" opt; do
   case $opt in
     i) INPUT="$OPTARG" ;;
     o) OUTPUT="$OPTARG" ;;
@@ -73,6 +165,10 @@ while getopts "i:o:s:c:z:p:b:l:t:w:k:S:O:C:M:G:U:h" opt; do
     M) META_COLOR="$OPTARG" ;;
     G) TAGLINE_COLOR="$OPTARG" ;;
     U) URL_COLOR="$OPTARG" ;;
+    1) TITLE_SHADOW="$OPTARG" ;;
+    2) META_SHADOW="$OPTARG" ;;
+    3) TAGLINE_SHADOW="$OPTARG" ;;
+    4) URL_SHADOW="$OPTARG" ;;
     h) usage ;;
     *) usage ;;
   esac
@@ -158,38 +254,66 @@ INFO_FONT=$((thumb_height/9))     # much smaller
 HEADER_LINE_Y=$((header_h/2 - HEADER_FONT/2 - 10))  # center block
 META_Y=$((HEADER_LINE_Y + HEADER_FONT + 24))        # extra space below filename
 
-# Draw shadow first, then main text for both header lines, using user colors
+# Compose header text with effect logic for title and metadata
 convert "$TMPDIR/composite.png" \
-  -fill "$SHADOW_COLOR" -gravity NorthWest -pointsize $HEADER_FONT -annotate +$((padding*2+${SHADOW_OFFSET%%x*}))+$((HEADER_LINE_Y+${SHADOW_OFFSET#*x})) "$HEADER1" \
-  -fill "$TITLE_COLOR" -gravity NorthWest -pointsize $HEADER_FONT -annotate +$((padding*2))+$HEADER_LINE_Y "$HEADER1" \
-  -fill "$SHADOW_COLOR" -gravity NorthWest -pointsize $INFO_FONT -annotate +$((padding*2+${SHADOW_OFFSET%%x*}))+$((META_Y+${SHADOW_OFFSET#*x})) "$HEADER2" \
-  -fill "$META_COLOR" -gravity NorthWest -pointsize $INFO_FONT -annotate +$((padding*2))+$META_Y "$HEADER2" \
+  $(
+    if [ "$TITLE_EFFECT" = "shadow" ]; then
+      echo "-fill $TITLE_SHADOW_COLOR -gravity NorthWest -pointsize $HEADER_FONT -annotate +$((padding*2+${TITLE_SHADOW_OFFSET%%x*}))+$((HEADER_LINE_Y+${TITLE_SHADOW_OFFSET#*x})) '$HEADER1'"
+      if [ "$TITLE_SHADOW_BLUR" -gt 0 ]; then
+        echo "-blur 0x$TITLE_SHADOW_BLUR"
+      fi
+      echo "-fill $TITLE_COLOR -gravity NorthWest -pointsize $HEADER_FONT -annotate +$((padding*2))+$HEADER_LINE_Y '$HEADER1'"
+    elif [ "$TITLE_EFFECT" = "outline" ]; then
+      echo "-stroke $TITLE_OUTLINE_COLOR -strokewidth $TITLE_OUTLINE_WIDTH -fill $TITLE_COLOR -gravity NorthWest -pointsize $HEADER_FONT -annotate +$((padding*2))+$HEADER_LINE_Y '$HEADER1' -stroke none"
+    else
+      echo "-fill $TITLE_COLOR -gravity NorthWest -pointsize $HEADER_FONT -annotate +$((padding*2))+$HEADER_LINE_Y '$HEADER1'"
+    fi
+  ) \
+  $(
+    if [ "$META_EFFECT" = "shadow" ]; then
+      echo "-fill $META_SHADOW_COLOR -gravity NorthWest -pointsize $INFO_FONT -annotate +$((padding*2+${META_SHADOW_OFFSET%%x*}))+$((META_Y+${META_SHADOW_OFFSET#*x})) '$HEADER2'"
+      if [ "$META_SHADOW_BLUR" -gt 0 ]; then
+        echo "-blur 0x$META_SHADOW_BLUR"
+      fi
+      echo "-fill $META_COLOR -gravity NorthWest -pointsize $INFO_FONT -annotate +$((padding*2))+$META_Y '$HEADER2'"
+    elif [ "$META_EFFECT" = "outline" ]; then
+      echo "-stroke $META_OUTLINE_COLOR -strokewidth $META_OUTLINE_WIDTH -fill $META_COLOR -gravity NorthWest -pointsize $INFO_FONT -annotate +$((padding*2))+$META_Y '$HEADER2' -stroke none"
+    else
+      echo "-fill $META_COLOR -gravity NorthWest -pointsize $INFO_FONT -annotate +$((padding*2))+$META_Y '$HEADER2'"
+    fi
+  ) \
   "$TMPDIR/headered.png"
 
 # --- ADD LOGO AND TAGLINE IN HEADER ---
-# Calculate fonts for tagline and URL (always set, regardless of logo)
-TAG_FONT=$((thumb_height/7))
-URL_FONT=$((thumb_height/10))
-
-if [ -f "$LOGO" ]; then
-  # Make logo 25% smaller than before
-  LOGOW=$(awk "BEGIN {printf \"%d\", $header_h / 2.67}")
-  # Calculate total block height (logo + tagline + URL + spacing)
-  LOGO_BLOCK_H=$((LOGOW + TAG_FONT + URL_FONT + 30))
-  # Center the block vertically in the header
-  LOGO_Y=$(( (header_h - LOGO_BLOCK_H) / 2 ))
-  LOGOPAD=$((padding*2))
-  convert "$LOGO" -resize x${LOGOW} "$TMPDIR/logo.png"
-  composite -gravity NorthEast -geometry +${LOGOPAD}+${LOGO_Y} "$TMPDIR/logo.png" "$TMPDIR/headered.png" "$TMPDIR/logoed.png"
-else
-  cp "$TMPDIR/headered.png" "$TMPDIR/logoed.png"
-fi
-# Vertically center tagline and URL below logo (always use TAG_FONT and URL_FONT)
 LOGOPAD=$((padding*2))
 LOGO_Y=$(( (header_h - (TAG_FONT + URL_FONT + 30)) / 2 ))
 convert "$TMPDIR/logoed.png" \
-  -gravity NorthEast -fill "$TAGLINE_COLOR" -pointsize $TAG_FONT -annotate +$((LOGOPAD))+$(($LOGO_Y + 10)) "$TAGLINE" \
-  -gravity NorthEast -fill "$URL_COLOR" -pointsize $URL_FONT -annotate +$((LOGOPAD))+$(($LOGO_Y + TAG_FONT + 20)) "$URL" \
+  $(
+    if [ "$TAGLINE_EFFECT" = "shadow" ]; then
+      echo "-fill $TAGLINE_SHADOW_COLOR -gravity NorthEast -pointsize $TAG_FONT -annotate +$((LOGOPAD+${TAGLINE_SHADOW_OFFSET%%x*}))+$(($LOGO_Y + 10 + ${TAGLINE_SHADOW_OFFSET#*x})) '$TAGLINE'"
+      if [ "$TAGLINE_SHADOW_BLUR" -gt 0 ]; then
+        echo "-blur 0x$TAGLINE_SHADOW_BLUR"
+      fi
+      echo "-gravity NorthEast -fill $TAGLINE_COLOR -pointsize $TAG_FONT -annotate +$((LOGOPAD))+$(($LOGO_Y + 10)) '$TAGLINE'"
+    elif [ "$TAGLINE_EFFECT" = "outline" ]; then
+      echo "-gravity NorthEast -stroke $TAGLINE_OUTLINE_COLOR -strokewidth $TAGLINE_OUTLINE_WIDTH -fill $TAGLINE_COLOR -pointsize $TAG_FONT -annotate +$((LOGOPAD))+$(($LOGO_Y + 10)) '$TAGLINE' -stroke none"
+    else
+      echo "-gravity NorthEast -fill $TAGLINE_COLOR -pointsize $TAG_FONT -annotate +$((LOGOPAD))+$(($LOGO_Y + 10)) '$TAGLINE'"
+    fi
+  ) \
+  $(
+    if [ "$URL_EFFECT" = "shadow" ]; then
+      echo "-fill $URL_SHADOW_COLOR -gravity NorthEast -pointsize $URL_FONT -annotate +$((LOGOPAD+${URL_SHADOW_OFFSET%%x*}))+$(($LOGO_Y + TAG_FONT + 20 + ${URL_SHADOW_OFFSET#*x})) '$URL'"
+      if [ "$URL_SHADOW_BLUR" -gt 0 ]; then
+        echo "-blur 0x$URL_SHADOW_BLUR"
+      fi
+      echo "-gravity NorthEast -fill $URL_COLOR -pointsize $URL_FONT -annotate +$((LOGOPAD))+$(($LOGO_Y + TAG_FONT + 20)) '$URL'"
+    elif [ "$URL_EFFECT" = "outline" ]; then
+      echo "-gravity NorthEast -stroke $URL_OUTLINE_COLOR -strokewidth $URL_OUTLINE_WIDTH -fill $URL_COLOR -pointsize $URL_FONT -annotate +$((LOGOPAD))+$(($LOGO_Y + TAG_FONT + 20)) '$URL' -stroke none"
+    else
+      echo "-gravity NorthEast -fill $URL_COLOR -pointsize $URL_FONT -annotate +$((LOGOPAD))+$(($LOGO_Y + TAG_FONT + 20)) '$URL'"
+    fi
+  ) \
   "$TMPDIR/final.png"
 
 echo "[SnapGrid] Finalizing output..."
