@@ -155,11 +155,13 @@ convert "$TMPDIR/composite.png" \
   "$TMPDIR/headered.png"
 
 # --- ADD LOGO AND TAGLINE IN HEADER ---
+# Calculate fonts for tagline and URL (always set, regardless of logo)
+TAG_FONT=$((thumb_height/7))
+URL_FONT=$((thumb_height/10))
+
 if [ -f "$LOGO" ]; then
   # Make logo 25% smaller than before
   LOGOW=$(awk "BEGIN {printf \"%d\", $header_h / 2.67}")
-  TAG_FONT=$((thumb_height/7))
-  URL_FONT=$((thumb_height/10))
   # Calculate total block height (logo + tagline + URL + spacing)
   LOGO_BLOCK_H=$((LOGOW + TAG_FONT + URL_FONT + 30))
   # Center the block vertically in the header
@@ -170,10 +172,12 @@ if [ -f "$LOGO" ]; then
 else
   cp "$TMPDIR/headered.png" "$TMPDIR/logoed.png"
 fi
-# Vertically center tagline and URL below logo
+# Vertically center tagline and URL below logo (always use TAG_FONT and URL_FONT)
+LOGOPAD=$((padding*2))
+LOGO_Y=$(( (header_h - (TAG_FONT + URL_FONT + 30)) / 2 ))
 convert "$TMPDIR/logoed.png" \
-  -gravity NorthEast -fill white -pointsize $TAG_FONT -annotate +$((LOGOPAD))+$(($LOGO_Y + LOGOW + 10)) "$TAGLINE" \
-  -gravity NorthEast -fill '#b0c4ff' -pointsize $URL_FONT -annotate +$((LOGOPAD))+$(($LOGO_Y + LOGOW + TAG_FONT + 20)) "$URL" \
+  -gravity NorthEast -fill white -pointsize $TAG_FONT -annotate +$((LOGOPAD))+$(($LOGO_Y + 10)) "$TAGLINE" \
+  -gravity NorthEast -fill '#b0c4ff' -pointsize $URL_FONT -annotate +$((LOGOPAD))+$(($LOGO_Y + TAG_FONT + 20)) "$URL" \
   "$TMPDIR/final.png"
 
 echo "[SnapGrid] Finalizing output..."
