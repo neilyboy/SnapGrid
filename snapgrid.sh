@@ -258,28 +258,28 @@ META_Y=$((HEADER_LINE_Y + HEADER_FONT + 24))        # extra space below filename
 convert "$TMPDIR/composite.png" \
   $(
     if [ "$TITLE_EFFECT" = "shadow" ]; then
-      echo "-fill $TITLE_SHADOW_COLOR -gravity NorthWest -pointsize $HEADER_FONT -annotate +$((padding*2+${TITLE_SHADOW_OFFSET%%x*}))+$((HEADER_LINE_Y+${TITLE_SHADOW_OFFSET#*x})) '$HEADER1'"
+      echo "-fill $TITLE_SHADOW_COLOR -gravity NorthWest -pointsize $HEADER_FONT -annotate +$((padding*2+${TITLE_SHADOW_OFFSET%%x*}))+$((HEADER_LINE_Y+${TITLE_SHADOW_OFFSET#*x})) \"$HEADER1\""
       if [ "$TITLE_SHADOW_BLUR" -gt 0 ]; then
         echo "-blur 0x$TITLE_SHADOW_BLUR"
       fi
-      echo "-fill $TITLE_COLOR -gravity NorthWest -pointsize $HEADER_FONT -annotate +$((padding*2))+$HEADER_LINE_Y '$HEADER1'"
+      echo "-fill $TITLE_COLOR -gravity NorthWest -pointsize $HEADER_FONT -annotate +$((padding*2))+$HEADER_LINE_Y \"$HEADER1\""
     elif [ "$TITLE_EFFECT" = "outline" ]; then
-      echo "-stroke $TITLE_OUTLINE_COLOR -strokewidth $TITLE_OUTLINE_WIDTH -fill $TITLE_COLOR -gravity NorthWest -pointsize $HEADER_FONT -annotate +$((padding*2))+$HEADER_LINE_Y '$HEADER1' -stroke none"
+      echo "-stroke $TITLE_OUTLINE_COLOR -strokewidth $TITLE_OUTLINE_WIDTH -fill $TITLE_COLOR -gravity NorthWest -pointsize $HEADER_FONT -annotate +$((padding*2))+$HEADER_LINE_Y \"$HEADER1\" -stroke none"
     else
-      echo "-fill $TITLE_COLOR -gravity NorthWest -pointsize $HEADER_FONT -annotate +$((padding*2))+$HEADER_LINE_Y '$HEADER1'"
+      echo "-fill $TITLE_COLOR -gravity NorthWest -pointsize $HEADER_FONT -annotate +$((padding*2))+$HEADER_LINE_Y \"$HEADER1\""
     fi
   ) \
   $(
     if [ "$META_EFFECT" = "shadow" ]; then
-      echo "-fill $META_SHADOW_COLOR -gravity NorthWest -pointsize $INFO_FONT -annotate +$((padding*2+${META_SHADOW_OFFSET%%x*}))+$((META_Y+${META_SHADOW_OFFSET#*x})) '$HEADER2'"
+      echo "-fill $META_SHADOW_COLOR -gravity NorthWest -pointsize $INFO_FONT -annotate +$((padding*2+${META_SHADOW_OFFSET%%x*}))+$((META_Y+${META_SHADOW_OFFSET#*x})) \"$HEADER2\""
       if [ "$META_SHADOW_BLUR" -gt 0 ]; then
         echo "-blur 0x$META_SHADOW_BLUR"
       fi
-      echo "-fill $META_COLOR -gravity NorthWest -pointsize $INFO_FONT -annotate +$((padding*2))+$META_Y '$HEADER2'"
+      echo "-fill $META_COLOR -gravity NorthWest -pointsize $INFO_FONT -annotate +$((padding*2))+$META_Y \"$HEADER2\""
     elif [ "$META_EFFECT" = "outline" ]; then
-      echo "-stroke $META_OUTLINE_COLOR -strokewidth $META_OUTLINE_WIDTH -fill $META_COLOR -gravity NorthWest -pointsize $INFO_FONT -annotate +$((padding*2))+$META_Y '$HEADER2' -stroke none"
+      echo "-stroke $META_OUTLINE_COLOR -strokewidth $META_OUTLINE_WIDTH -fill $META_COLOR -gravity NorthWest -pointsize $INFO_FONT -annotate +$((padding*2))+$META_Y \"$HEADER2\" -stroke none"
     else
-      echo "-fill $META_COLOR -gravity NorthWest -pointsize $INFO_FONT -annotate +$((padding*2))+$META_Y '$HEADER2'"
+      echo "-fill $META_COLOR -gravity NorthWest -pointsize $INFO_FONT -annotate +$((padding*2))+$META_Y \"$HEADER2\""
     fi
   ) \
   "$TMPDIR/headered.png"
@@ -290,28 +290,28 @@ LOGO_Y=$(( (header_h - (TAG_FONT + URL_FONT + 30)) / 2 ))
 convert "$TMPDIR/logoed.png" \
   $(
     if [ "$TAGLINE_EFFECT" = "shadow" ]; then
-      echo "-fill $TAGLINE_SHADOW_COLOR -gravity NorthEast -pointsize $TAG_FONT -annotate +$((LOGOPAD+${TAGLINE_SHADOW_OFFSET%%x*}))+$(($LOGO_Y + 10 + ${TAGLINE_SHADOW_OFFSET#*x})) '$TAGLINE'"
+      echo "-fill $TAGLINE_SHADOW_COLOR -gravity NorthEast -pointsize $TAG_FONT -annotate +$((LOGOPAD+${TAGLINE_SHADOW_OFFSET%%x*}))+$(($LOGO_Y + 10 + ${TAGLINE_SHADOW_OFFSET#*x})) \"$TAGLINE\""
       if [ "$TAGLINE_SHADOW_BLUR" -gt 0 ]; then
         echo "-blur 0x$TAGLINE_SHADOW_BLUR"
       fi
-      echo "-gravity NorthEast -fill $TAGLINE_COLOR -pointsize $TAG_FONT -annotate +$((LOGOPAD))+$(($LOGO_Y + 10)) '$TAGLINE'"
+      echo "-gravity NorthEast -fill $TAGLINE_COLOR -pointsize $TAG_FONT -annotate +$((LOGOPAD))+$(($LOGO_Y + 10)) \"$TAGLINE\""
     elif [ "$TAGLINE_EFFECT" = "outline" ]; then
-      echo "-gravity NorthEast -stroke $TAGLINE_OUTLINE_COLOR -strokewidth $TAGLINE_OUTLINE_WIDTH -fill $TAGLINE_COLOR -pointsize $TAG_FONT -annotate +$((LOGOPAD))+$(($LOGO_Y + 10)) '$TAGLINE' -stroke none"
+      echo "-gravity NorthEast -stroke $TAGLINE_OUTLINE_COLOR -strokewidth $TAGLINE_OUTLINE_WIDTH -fill $TAGLINE_COLOR -pointsize $TAG_FONT -annotate +$((LOGOPAD))+$(($LOGO_Y + 10)) \"$TAGLINE\" -stroke none"
     else
-      echo "-gravity NorthEast -fill $TAGLINE_COLOR -pointsize $TAG_FONT -annotate +$((LOGOPAD))+$(($LOGO_Y + 10)) '$TAGLINE'"
+      echo "-gravity NorthEast -fill $TAGLINE_COLOR -pointsize $TAG_FONT -annotate +$((LOGOPAD))+$(($LOGO_Y + 10)) \"$TAGLINE\""
     fi
   ) \
   $(
     if [ "$URL_EFFECT" = "shadow" ]; then
-      echo "-fill $URL_SHADOW_COLOR -gravity NorthEast -pointsize $URL_FONT -annotate +$((LOGOPAD+${URL_SHADOW_OFFSET%%x*}))+$(($LOGO_Y + TAG_FONT + 20 + ${URL_SHADOW_OFFSET#*x})) '$URL'"
+      echo "-fill $URL_SHADOW_COLOR -gravity NorthEast -pointsize $URL_FONT -annotate +$((LOGOPAD+${URL_SHADOW_OFFSET%%x*}))+$(($LOGO_Y + TAG_FONT + 20 + ${URL_SHADOW_OFFSET#*x})) \"$URL\""
       if [ "$URL_SHADOW_BLUR" -gt 0 ]; then
         echo "-blur 0x$URL_SHADOW_BLUR"
       fi
-      echo "-gravity NorthEast -fill $URL_COLOR -pointsize $URL_FONT -annotate +$((LOGOPAD))+$(($LOGO_Y + TAG_FONT + 20)) '$URL'"
+      echo "-gravity NorthEast -fill $URL_COLOR -pointsize $URL_FONT -annotate +$((LOGOPAD))+$(($LOGO_Y + TAG_FONT + 20)) \"$URL\""
     elif [ "$URL_EFFECT" = "outline" ]; then
-      echo "-gravity NorthEast -stroke $URL_OUTLINE_COLOR -strokewidth $URL_OUTLINE_WIDTH -fill $URL_COLOR -pointsize $URL_FONT -annotate +$((LOGOPAD))+$(($LOGO_Y + TAG_FONT + 20)) '$URL' -stroke none"
+      echo "-gravity NorthEast -stroke $URL_OUTLINE_COLOR -strokewidth $URL_OUTLINE_WIDTH -fill $URL_COLOR -pointsize $URL_FONT -annotate +$((LOGOPAD))+$(($LOGO_Y + TAG_FONT + 20)) \"$URL\" -stroke none"
     else
-      echo "-gravity NorthEast -fill $URL_COLOR -pointsize $URL_FONT -annotate +$((LOGOPAD))+$(($LOGO_Y + TAG_FONT + 20)) '$URL'"
+      echo "-gravity NorthEast -fill $URL_COLOR -pointsize $URL_FONT -annotate +$((LOGOPAD))+$(($LOGO_Y + TAG_FONT + 20)) \"$URL\""
     fi
   ) \
   "$TMPDIR/final.png"
