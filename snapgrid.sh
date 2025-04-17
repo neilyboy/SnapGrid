@@ -114,11 +114,19 @@ usage() {
   echo "  --url-shadow-color <color>       (default: #222222)"
   echo "  --url-shadow-offset <XxY>        (default: 2x2)"
   echo "  --url-shadow-blur <radius>       (default: 0)"
+  echo "  --logo-height <px>            Logo height in pixels (default: 72)"
+  echo "  --header-font <fontname>       Header font name (default: DejaVu-Sans)"
+  echo "  --title-color <color>          Title (filename) text color (default: #ffffff)"
+  echo "  --meta-color <color>           Metadata line text color (default: #ffffff)"
+  echo "  --tagline-color <color>        Tagline text color (default: #ffffff)"
+  echo "  --url-color <color>            URL text color (default: #b0c4ff)"
   echo "  -h                    Show this help message"
   exit 1
 }
 
 # --- PARSE ARGS ---
+# First, handle long options and remove them from the argument list
+REMAINING_ARGS=()
 while [[ $# -gt 0 ]]; do
   case "$1" in
     -T) TITLE_EFFECT="$2"; shift 2;;
@@ -145,11 +153,19 @@ while [[ $# -gt 0 ]]; do
     --url-shadow-color) URL_SHADOW_COLOR="$2"; shift 2;;
     --url-shadow-offset) URL_SHADOW_OFFSET="$2"; shift 2;;
     --url-shadow-blur) URL_SHADOW_BLUR="$2"; shift 2;;
-    *) break;;
+    --logo-height) LOGO_HEIGHT_PX="$2"; shift 2;;
+    --header-font) HEADER_FONT_FILE="$2"; shift 2;;
+    --title-color) TITLE_COLOR="$2"; shift 2;;
+    --meta-color) META_COLOR="$2"; shift 2;;
+    --tagline-color) TAGLINE_COLOR="$2"; shift 2;;
+    --url-color) URL_COLOR="$2"; shift 2;;
+    --*) echo "Unknown option: $1"; shift 2;;
+    *) REMAINING_ARGS+=("$1"); shift;;
   esac
-done
+ done
+set -- "${REMAINING_ARGS[@]}"
 
-while getopts "i:o:s:c:z:p:b:l:t:w:k:S:O:C:M:G:U:1:2:3:4:h" opt; do
+while getopts "i:o:s:c:z:p:b:l:t:w:k:S:O:C:M:G:U:1:2:3:4:T:E:Q:W:h" opt; do
   case $opt in
     i) INPUT="$OPTARG" ;;
     o) OUTPUT="$OPTARG" ;;
@@ -175,6 +191,10 @@ while getopts "i:o:s:c:z:p:b:l:t:w:k:S:O:C:M:G:U:1:2:3:4:h" opt; do
     2) META_SHADOW="$OPTARG" ;;
     3) TAGLINE_SHADOW="$OPTARG" ;;
     4) URL_SHADOW="$OPTARG" ;;
+    T) TITLE_EFFECT="$OPTARG" ;;
+    E) META_EFFECT="$OPTARG" ;;
+    Q) TAGLINE_EFFECT="$OPTARG" ;;
+    W) URL_EFFECT="$OPTARG" ;;
     h) usage ;;
     *) usage ;;
   esac

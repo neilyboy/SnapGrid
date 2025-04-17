@@ -16,7 +16,9 @@
 
 ---
 
-![SampleOutput](https://github.com/user-attachments/assets/3c9a3de7-b61f-4231-9d37-8a9bd32258cd)
+<p align="center">
+  <img src="sample_output.png" alt="SnapGrid Example Output" width="90%"/>
+</p>
 
 ---
 
@@ -168,6 +170,48 @@ MIT
 <p align="center">
   <sub>Created with ❤️ by <a href="https://github.com/neilyboy">neilyboy</a> – Powered by <a href="https://ffmpeg.org/">ffmpeg</a> & <a href="https://imagemagick.org/">ImageMagick</a></sub>
 </p>
+
+## Using and Creating Theme Scripts
+
+You can save your favorite SnapGrid settings as a theme script for easy reuse. Just copy or create a shell script (e.g. `moon_phases_theme.sh`) in the same directory as `snapgrid.sh`.
+
+### Example: Moon Phases Theme
+
+```bash
+# moon_phases_theme.sh
+#!/bin/bash
+# Usage: ./moon_phases_theme.sh <inputfile> [outputfile]
+DIR="$(dirname "$0")"
+"$DIR/snapgrid.sh" -i "$1" -o "${2:-${1%.*}_moonphases.png}" \
+  -C '#212A31' -M '#748D92' -G '#124E66' -U '#D3D9D4' \
+  -T shadow -E outline -Q none -W shadow \
+  --title-color '#D3D9D4' --tagline-color '#D3D9D4' \
+  --logo-height 64 --header-font 'DejaVu-Sans' \
+  --title-shadow-color '#748D92' --title-shadow-blur 2 \
+  --title-outline-color '#124E66' --title-outline-width 2
+```
+
+#### To use the theme:
+```bash
+chmod +x moon_phases_theme.sh
+./moon_phases_theme.sh MyVideo.mkv
+```
+
+### Making Your Own Theme
+- Copy `moon_phases_theme.sh` and change the color and style variables at the top.
+- You can set any SnapGrid option in your theme script.
+- Save as `your_theme_name.sh` and run it with your video file as the argument.
+
+#### Example:
+```bash
+cp moon_phases_theme.sh my_custom_theme.sh
+# Edit my_custom_theme.sh and change colors/effects
+./my_custom_theme.sh input.mp4
+```
+
+---
+
+Themes make it easy to keep your SnapGrid style consistent and share your favorite looks with others!
 
 ## Advanced Header Customization
 
