@@ -299,6 +299,9 @@ else
 fi
 
 # --- ADD LOGO AND TAGLINE IN HEADER ---
+# Ensure fonts are set before use
+TAG_FONT=$((thumb_height/7))
+URL_FONT=$((thumb_height/10))
 LOGOPAD=$((padding*2))
 LOGO_Y=$(( (header_h - (TAG_FONT + URL_FONT + 30)) / 2 ))
 TAGGED_IMG="$TMPDIR/tagged.png"
